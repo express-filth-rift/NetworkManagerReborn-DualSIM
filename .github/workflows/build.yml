@@ -36,6 +36,13 @@ jobs:
           mkdir -p $HOME/theos/sdks
           cp -R /tmp/theos-sdks/iPhoneOS16.5.sdk $HOME/theos/sdks/
       
+      - name: Install CCSupport
+        run: |
+          git clone https://github.com/opa334/CCSupportTemplates.git $HOME/CCSupportTemplates
+          cd $HOME/CCSupportTemplates/
+          chmod +x install.sh
+          ./install.sh
+      
       - name: Build package
         run: |
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:$HOME/theos/bin:$PATH"
