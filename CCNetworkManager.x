@@ -11,16 +11,6 @@ NSInteger currentSlot = 0; // 0 = SIM1, 1 = SIM2/eSIM
 
 @implementation CCNetworkManager
 
-- (void)viewDidLoad {
-  [super viewDidLoad];
-  
-  // Add long press gesture for slot switching
-  UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] 
-    initWithTarget:self action:@selector(buttonLongPressed:)];
-  longPress.minimumPressDuration = 0.5;
-  [self.view addGestureRecognizer:longPress];
-}
-
 - (UIImage *)iconGlyph {
   UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 70, 70)];
   label.textColor = [UIColor blackColor];
@@ -79,19 +69,12 @@ NSInteger currentSlot = 0; // 0 = SIM1, 1 = SIM2/eSIM
 }
 
 - (void)setSelected:(BOOL)selected {
-  selectedNetwork = getNextEnabledNetwork();
-
-  CFStringRef kValue = (__bridge CFStringRef)[ratSelectionValues objectForKey:selectedNetwork];
-  CTServerConnectionRef cn = _CTServerConnectionCreate(kCFAllocatorDefault, callback, NULL);
-  _CTServerConnectionSetRATSelection(cn, kValue, (void *)(long)currentSlot);
-
-  writeSelectedNetwork();
-  [super reconfigureView];
-}
-
-- (void)buttonLongPressed:(UILongPressGestureRecognizer *)recognizer {
-  if (recognizer.state == UIGestureRecognizerStateBegan) {
-    // Switch SIM slot
+  // Check if this is a long press (hold for 0.5s will trigger multiple times)
+  static NSTimeInterval lastTap = 0;
+  NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+  
+  if (now - lastTap < 0.3) {
+    // Double tap detected - switch slot
     currentSlot = (currentSlot == 0) ? 1 : 0;
     
     // Load network setting for this slot
@@ -104,7 +87,17 @@ NSInteger currentSlot = 0; // 0 = SIM1, 1 = SIM2/eSIM
     _CTServerConnectionSetRATSelection(cn, kValue, (void *)(long)currentSlot);
     
     writeSelectedNetwork();
-    [super reconfigureView];
+    lastTap = 0; // Reset
+  } else {
+    // Single tap - change network mode
+    selectedNetwork = getNextEnabledNetwork();
+
+    CFStringRef kValue = (__bridge CFStringRef)[ratSelectionValues objectForKey:selectedNetwork];
+    CTServerConnectionRef cn = _CTServerConnectionCreate(kCFAllocatorDefault, callback, NULL);
+    _CTServerConnectionSetRATSelection(cn, kValue, (void *)(long)currentSlot);
+
+    writeSelectedNetwork();
+    lastTap = now;
   }
 }
 
