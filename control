@@ -1,9 +1,9 @@
 Package: me.nixuge.networkmanager
-Name: NetworkManagerReborn
+Name: NetworkManager DualSIM
 Depends: mobilesubstrate, com.opa334.ccsupport
-Version: 1.4.3
-Architecture: iphoneos-arm
-Description: Force 2G/3G/4G/5G connection from the Control Center
-Maintainer: Nixuge
-Author: NoisyFlake, Nixuge
+Version: 1.5.0
+Architecture: iphoneos-arm64e
+Description: 强制切换 2G/3G/4G/5G 网络制式，支持双卡切换（单击切换制式，长按切换卡槽）
+Maintainer: Nixuge, 灰灰
+Author: NoisyFlake, Nixuge, 灰灰
 Section: Control Center (Modules)
